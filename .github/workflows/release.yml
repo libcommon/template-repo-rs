@@ -33,7 +33,7 @@ jobs:
 
         os:
           - macos-latest
-          - windows-latest
+          - ubuntu-latest
 
         include:
           - os: macos-latest
