@@ -31,12 +31,20 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests and check code
+        shell: bash
         run: |
-          ./run.sh build
+          if [ -z "$(find src/ -maxdepth 0 -empty -type d)" ]
+          then
+            ./run.sh build
+          fi
 
       - name: Build documentation
+        shell: bash
         run: |
-          ./run.sh make-docs
+          if [ -z "$(find src/ -maxdepth 0 -empty -type d)" ]
+          then
+            ./run.sh make-docs
+          fi
 
       - name: Approve the PR
         run: gh pr review --approve "${PR_URL}"
