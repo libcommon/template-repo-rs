@@ -3,11 +3,13 @@ on:
   pull_request:
     branches:
       - "build-support/docker/**"
-  push:
-    branches:
-      - master
+    types:
+      - closed
+      - opened
+      - reopened
+      - synchronize
   schedule:
-    # one per week on Fridays at midnight
+    # once per week on Fridays at midnight
     - cron: "0 0 * * 5"
   workflow_call:
     inputs:
@@ -72,6 +74,19 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Push build container image to registry
-        if: "${{ ! startsWith(github.ref_name, 'build-support/docker') || inputs.push_container || github.event.inputs.push_container }}"
+        # Push the build container to registry for the following events:
+        #   * Merge PR to master branch
+        #   * Workflow triggered by cron job (schedule)
+        #   * Workflow was called with push_container set to true
+        #   * Workflow was dispatched with push_container set to true
+        # See: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+        # and https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads
+        if: |
+          "${{
+            ( startsWith(github.ref_name, 'build-support/docker') && github.event.pull_request.base.ref == 'master' )
+            || github.event_name == 'schedule'
+            || inputs.push_container
+            || github.event.inputs.push_container
+          }}"
         run: |
           ./run.sh push-base
