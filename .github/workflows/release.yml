@@ -19,7 +19,7 @@ jobs:
             ${{ github.ref }} --title Release ${{ github.ref }})"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-    output:
+    outputs:
       release_url: "${{ steps.create-release.outputs.release_url }}"
 
   build-release-binaries:
