@@ -1,3 +1,10 @@
+# Inspiration taken from three primary sources:
+#   1. The ripgrep repository release workflow
+#     * https://github.com/BurntSushi/ripgrep/blob/master/.github/workflows/release.yml
+#   2. Article on automated multi-platform releases in GitHub Actions linked to in ripgrep workflow file
+#     * https://eugene-babichenko.github.io/blog/2020/05/09/github-actions-cross-platform-auto-releases/
+#   3. The cargo-deny release workflow file
+#     * https://github.com/EmbarkStudios/cargo-deny/blob/main/.github/workflows/ci.yaml
 name: Compile Release Binaries and Create New Release
 on:
   push:
