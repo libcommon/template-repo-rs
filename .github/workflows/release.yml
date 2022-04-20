@@ -38,6 +38,7 @@ jobs:
     strategy:
       matrix:
 
+        target: []
         os:
           - macos-latest
           - ubuntu-latest
