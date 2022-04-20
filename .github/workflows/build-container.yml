@@ -17,14 +17,14 @@ on:
         type: boolean
         required: false
         default: true
-        description: "Whether to push build container to configured container registry"
+        description: "Push build container to configured container registry"
   workflow_dispatch:
     inputs:
       push_container:
         type: boolean
         required: false
         default: true
-        description: "Whether to push build container to configured container registry"
+        description: "Push build container to configured container registry"
 
 jobs:
 
