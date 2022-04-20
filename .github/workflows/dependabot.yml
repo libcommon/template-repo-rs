@@ -33,7 +33,7 @@ jobs:
       - name: Run tests and check code
         shell: bash
         run: |
-          if [ -z "$(find src/ -maxdepth 0 -empty -type d)" ]
+          if [ -d "src/" ] && [ -z "$(find src/ -maxdepth 0 -empty -type d)" ]
           then
             ./run.sh build
           fi
@@ -41,7 +41,7 @@ jobs:
       - name: Build documentation
         shell: bash
         run: |
-          if [ -z "$(find src/ -maxdepth 0 -empty -type d)" ]
+          if [ -d "src/" ] && [ -z "$(find src/ -maxdepth 0 -empty -type d)" ]
           then
             ./run.sh make-docs
           fi
