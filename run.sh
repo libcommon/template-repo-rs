@@ -62,6 +62,19 @@ run-in-container() {
 ##### Command Utilities #####
 #############################
 
+# Remove `--release` or `--profile <profile>` from command line flags
+remove-profile-flags() {
+    local NEW_ARGS="${@}"
+    if ( echo "${@}" | grep '\-\-release' 1>/dev/null )
+    then
+        NEW_ARGS="${NEW_ARGS/--release/}"
+    elif ( echo "${@}" | grep '\-\-profile' 1>/dev/null )
+    then
+        NEW_ARGS="$(echo ${NEW_ARGS} | sed 's/--profile [^ ]\+//g')"
+    fi
+    echo "${NEW_ARGS}"
+}
+
 run-command() {
     local COMMAND="${1}"
     shift
@@ -84,15 +97,20 @@ run-command() {
 ####################
 
 run-build() {
-    run-check
+    CHECK_TEST_ARGS="$(remove-profile-flags ${@})"
+
+    run-check ${CHECK_TEST_ARGS}
 
     run-fmt-check
 
-    run-lint
+    run-lint ${CHECK_TEST_ARGS}
 
     run-check-deps
 
-    run-test "${@}"
+    run-test ${CHECK_TEST_ARGS}
+
+    # Clean compilation directory after compiling for tests
+    run-clean ${CHECK_TEST_ARGS}
 
     info "Compiling package"
     cross build "${@}"
@@ -196,14 +214,16 @@ run-shell() {
 }
 
 run-test() {
+    local TEST_ARGS="$(remove-profile-flags ${@})"
+    export CARGO_INCREMENTAL=0 
+    export RUSTC_BOOTSTRAP=1 
+    export RUSTDOCFLAGS="-Cpanic=abort" 
+    export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort" 
+
     # See https://github.com/mozilla/grcov#example-how-to-generate-gcda-files-for-a-rust-project
     # for documentation on generating .gcda file for a Rust project
     info "Compiling package with coverage information"
-    export CARGO_INCREMENTAL=0
-    export RUSTC_BOOTSTRAP=1
-    export RUSTDOCFLAGS="-Cpanic=abort"
-    export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
-    cross build "${@}"
+    cross build ${TEST_ARGS}
     
     info "Running package tests"
     cross test "${@}"
@@ -217,6 +237,11 @@ run-test() {
         TARGET_ROOT_DIRECTORY="./target/${TARGET_PLATFORM}"
     fi
     grcov . -s . --binary-path "${TARGET_ROOT_DIRECTORY}/" -t html --branch --ignore-not-existing -o "${TARGET_ROOT_DIRECTORY}/coverage/"
+
+    unset CARGO_INCREMENTAL
+    unset RUSTC_BOOTSTRAP
+    unset RUSTDOCFLAGS
+    unset RUSTFLAGS
 }
 
 run-update-deps() {
