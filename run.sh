@@ -121,7 +121,7 @@ run-clean() {
 }
 
 run-exec() {
-    info "Running command: ${@}"
+    info "Running command: ${*}"
     ${@}
 }
 
