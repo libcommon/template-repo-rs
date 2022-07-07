@@ -12,7 +12,7 @@ then
 fi
 
 info "Installing Cross for cross-compilation and testing"
-sudo -Hiu $USERNAME bash -c '$HOME/.cargo/bin/cargo install --locked cross'
+sudo -Hiu $USERNAME bash -c '$HOME/.cargo/bin/cargo install --locked --version 0.2.1 cross'
 
 info "Installing cargo-deny for dependency linting"
 sudo -Hiu $USERNAME bash -c '$HOME/.cargo/bin/cargo install --locked cargo-deny'
